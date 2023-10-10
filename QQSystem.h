@@ -37,8 +37,8 @@ public:
 	void showFriend();
 	void updateFriend();
 	void newFriend();
-	void readFriend(std::string filename);
-	void saveFriends(std::string filename);//保存当前id的好友列表
+	void readFriends();
+	void saveFriends();//保存当前id的好友列表
 	void updateApplication(int id, Friend u);//更新被申请对象的申请列表
 	std::string getEnumName(int a);
 //private:

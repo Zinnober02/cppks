@@ -13,18 +13,23 @@ void test01() {
 	QQ->users.push_back(QQUser(6, "1", "e"));
 	QQ->users.push_back(QQUser(7, "1", "f"));
 	QQ->users.push_back(QQUser(8, "1", "g"));
+	
+}
+
+void test02() {
 	QQ->friends.push_back({2, "aa"});
 	QQ->friends.push_back({3, "bb"});
 	QQ->friends.push_back({4, "cc"});
-	QQ->tmpFriends.push_back({ 5, "dd" });
-	QQ->tmpFriends.push_back({ 6, "dd", reject });
-	QQ->tmpFriends.push_back({ 7, "dd" });
-	QQ->saveFriends("friends.txt");
-	QQ->saveFriends("tmpFriends.txt");
+	QQ->tmpFriends.push_back({ 5, "dd", 0});
+	QQ->tmpFriends.push_back({ 6, "dd", 2 });
+	QQ->tmpFriends.push_back({ 7, "dd", 0 });
+	QQ->saveFriends();
 }
 
 int main() {
 	test01();
+	test02();
+	//QQ->readFriends();
 	//QQ->showFriend();
 	//QQ->addFriend();
 	QQ->newFriend();
