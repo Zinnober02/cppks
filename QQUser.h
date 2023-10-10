@@ -13,7 +13,7 @@ public:
 	std::string _user_name;
 	
 public:
-	QQUser();
+	QQUser() {};
 	QQUser(int id, std::string password, std::string user_name) : _id(id), _password(password), _user_name(user_name) {};
 };
 
