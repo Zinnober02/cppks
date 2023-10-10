@@ -13,7 +13,7 @@ void test01() {
 	QQ->users.push_back(QQUser(6, "1", "e"));
 	QQ->users.push_back(QQUser(7, "1", "f"));
 	QQ->users.push_back(QQUser(8, "1", "g"));
-	
+	QQ->saveUsers();
 }
 
 void test02() {
@@ -27,9 +27,10 @@ void test02() {
 }
 
 int main() {
-	test01();
-	test02();
-	//QQ->readFriends();
+	//test01();
+	//test02();
+	QQ->readUsers();
+	QQ->readFriends();
 	//QQ->showFriend();
 	//QQ->addFriend();
 	QQ->newFriend();

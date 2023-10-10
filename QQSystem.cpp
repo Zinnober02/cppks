@@ -9,6 +9,43 @@ QQUser* QQSystem::selectUser(int id)
 	else return nullptr;
 }
 
+void QQSystem::saveUsers()
+{
+	//相对路径  ./账号
+	std::filesystem::path current_dir = std::filesystem::current_path();
+	std::filesystem::path dir_path = current_dir / "flies";
+	if (!std::filesystem::exists(dir_path))
+		std::filesystem::create_directories(dir_path);
+	std::ofstream file(dir_path / "QQUsers.txt", std::ios::out);
+	if (file.is_open()) {
+		for (const auto& user : users)
+			file << user._id << " " << user._user_name << " " << user._password << std::endl;
+		file.close();
+	}
+	else std::cerr << "无法打开文件进行写入: " << dir_path / "flies" / "QQUsers.txt" << std::endl;
+}
+
+void QQSystem::readUsers()
+{
+	//相对路径  ./账号
+	std::filesystem::path current_dir = std::filesystem::current_path();
+	std::filesystem::path dir_path = current_dir / "flies";
+	if (!std::filesystem::exists(dir_path))
+		std::filesystem::create_directories(dir_path);
+	std::ifstream file(dir_path / "QQUsers.txt");
+	if (file.is_open()) {
+		std::string line;
+		while (getline(file, line)) {
+			std::stringstream ss(line);
+			QQUser tmp;
+			ss >> tmp._id >> tmp._user_name >> tmp._password;
+			users.push_back(tmp);
+		}
+		file.close();
+	}
+	else std::cerr << "无法打开文件进行读取: " << dir_path / "flies" / "QQUsers.txt" << std::endl;
+}
+
 void QQSystem::addFriend()
 {
 	std::cout << "请输入QQ号" << std::endl;
