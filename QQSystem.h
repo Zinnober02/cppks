@@ -1,13 +1,9 @@
 #pragma once
-#include <string>
-#include <vector>
 #include "QQUser.h"
 #include <algorithm>
 #include <Windows.h>
-#include <fstream>
+#include "utils.h"
 #include <filesystem>
-#include <sstream> 
-
 const int wait = 0;
 const int reject = 2;
 const int agree = 1;
@@ -17,7 +13,17 @@ const int agree = 1;
 struct Friend {
 	int id;
 	std::string nickname;
+	bool flag = false;
 	int status = wait;
+
+	friend std::ostream& operator<<(std::ostream& os, const Friend& obj) {
+		os << obj.id << " " << obj.nickname << " " << obj.flag << " " << obj.status;
+		return os;
+	}
+	friend std::istream& operator>>(std::istream& is, Friend& obj) {
+		is >> obj.id >> obj.nickname >> obj.flag >> obj.status;
+		return is;
+	}
 };
 
 class QQSystem
@@ -28,19 +34,17 @@ public:
 	void deleteUser();
 	QQUser* selectUser(int id);
 	void updateUser();
-	void saveUsers();
-	void readUsers();
 	//好友相关
 	void addFriend();
 	void deleteFriend();
-	void selectFriend();
-	void showFriend();
+	static bool deleteFriend(std::vector<Friend>& friends, int id);
+	Friend* selectFriend(int id);
+	
+	void showFriend(); 
 	void updateFriend();
 	void newFriend();
-	void readFriends();
-	void saveFriends();//保存当前id的好友列表
-	void updateApplication(int id, Friend u);//更新被申请对象的申请列表
-	std::string getEnumName(int a);
+	bool updateApplication(int id, Friend u, bool flag = true);//更新被申请对象的申请列表
+	std::string getEnumName(const Friend& a);
 //private:
 	QQSystem(QQUser* user) : currentUser(user) {};
 	QQUser* currentUser;
@@ -48,4 +52,3 @@ public:
 	std::vector<Friend> friends;
 	std::vector<Friend> tmpFriends;
 };
-

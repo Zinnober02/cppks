@@ -133,6 +133,7 @@
     <ClCompile Include="QQUser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="utils.h" />
     <ClInclude Include="QQSystem.h" />
     <ClInclude Include="QQUser.h" />
   </ItemGroup>
