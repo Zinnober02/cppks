@@ -26,18 +26,21 @@ struct Friend {
 };
 
 namespace utils {
-	const std::string fn1 = "friends.txt";
-	const std::string fn2 = "tmpFriends.txt";
+	const std::string filename[6] =
+	{"QQUsers.txt", "friends.txt", "tmpFriends.txt",  "QQGroups.txt", "groups.txt", "tmpGroups.txt"};
+
 
 	template<class T>
-	bool saveData(std::string filename, const std::vector<T>& data, int id = 0)
+	bool saveData(int index, const std::vector<T>& data, int id = 0)
 	{
 		//相对路径  ./账号
+		std::string path = index < 6 ? "QQ" : "WeChat";
 		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = id ? current_dir / "flies" / std::to_string(id) : current_dir / "flies";
+		std::filesystem::path dir_path = 
+			id ? current_dir / "files" / path / std::to_string(id) : current_dir / "files" / path;
 		if (!std::filesystem::exists(dir_path))
 			std::filesystem::create_directories(dir_path);
-		std::ofstream file(dir_path / filename, std::ios::out);
+		std::ofstream file(dir_path / filename[index], std::ios::out);
 
 		if (file.is_open()) {
 			for (const auto& item : data)
@@ -45,25 +48,27 @@ namespace utils {
 			file.close();
 		}
 		else {
-			std::cerr << "无法打开文件进行写入: " << dir_path / filename << std::endl;
+			std::cerr << "无法打开文件进行写入: " << dir_path / filename[index] << std::endl;
 			return false;
 		}
 		return true;
 	}
 
 	template <class T>
-	std::vector<T> readData(std::string filename, int id = 0) {
+	std::vector<T> readData(int index, int id = 0) {
 		//相对路径  ./账号
+		std::string path = index < 6 ? "QQ" : "WeChat";
 		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = id ? (current_dir / "files" / std::to_string(id)) : (current_dir / "files");
+		std::filesystem::path dir_path = 
+			id ? current_dir / "files" / path / std::to_string(id) : current_dir / "files" / path;
 		if (!std::filesystem::exists(dir_path)) {
 			std::filesystem::create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
 		}
 		std::vector<T> list;
-		std::ofstream tmpFile(dir_path / filename, std::ios::app);
+		std::ofstream tmpFile(dir_path / filename[index], std::ios::app);
 		tmpFile.close();
-		std::ifstream file(dir_path / filename, std::ios::in);
+		std::ifstream file(dir_path / filename[index], std::ios::in);
 		if (file.is_open()) {
 			std::string line;
 			while (getline(file, line)) {
@@ -75,7 +80,7 @@ namespace utils {
 			file.close();
 		}
 		else {
-			std::cerr << "无法打开文件进行读取: " << dir_path / filename << std::endl;
+			std::cerr << "无法打开文件进行读取: " << dir_path / filename[index] << std::endl;
 			return std::vector<T>();
 		}
 		return list;
@@ -83,21 +88,22 @@ namespace utils {
 
 
 	template<class T>
-	bool addObj(std::string filename, int id, T& u) {
+	bool addObj(int index, int id, T& u) {
 		//相对路径  ./账号
+		std::string path = index < 6 ? "QQ" : "WeChat";
 		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = current_dir / "files" / std::to_string(id);
+		std::filesystem::path dir_path = current_dir / "files" / path / std::to_string(id);
 		if (!std::filesystem::exists(dir_path)) {
 			std::filesystem::create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
 		}
-		std::ofstream file(dir_path / filename, std::ios::app);
+		std::ofstream file(dir_path / filename[index], std::ios::app);
 		if (file.is_open()) {
 			file << u << std::endl;
 			file.close();
 		}
 		else {
-			std::cerr << "无法打开文件进行写入: " << dir_path / filename << std::endl;
+			std::cerr << "无法打开文件进行写入: " << dir_path / filename[index] << std::endl;
 			return false;
 		}
 		return true;

@@ -22,8 +22,8 @@ void QQSystem::addFriend()
 	tmpFriends.push_back({ id, nickname });
 	//同时也要给对方的好友申请添加一个
 	Friend u = { currentUser->_id, nickname, true };
-	if (utils::addObj(utils::fn2, id, u))
-		if (utils::saveData<Friend>(utils::fn2, tmpFriends, currentUser->_id))
+	if (utils::addObj(2, id, u))
+		if (utils::saveData<Friend>(2, tmpFriends, currentUser->_id))
 			std::cout << "成功发送好友申请，等待对方同意" << std::endl;
 }
 
@@ -34,11 +34,11 @@ void QQSystem::deleteFriend()
 	int id;
 	std::cin >> id;
 	QQSystem::deleteFriend(this->friends, id);
-	utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
+	utils::saveData<Friend>(1, friends, currentUser->_id);
 	//对方的好友也要删除
-	auto targetFriends = utils::readData<Friend>(utils::fn1, id);
+	auto targetFriends = utils::readData<Friend>(1, id);
 	QQSystem::deleteFriend(targetFriends, currentUser->_id);
-	utils::saveData<Friend>(utils::fn1, targetFriends, id);
+	utils::saveData<Friend>(1, targetFriends, id);
 }
 
 bool QQSystem::deleteFriend(std::vector<Friend>& friends, int id)
@@ -79,7 +79,7 @@ void QQSystem::updateFriend()
 	std::cin >> nickname;
 	auto item = utils::selectTarget(friends, id, [id](const Friend& item, int _id) {return _id == item.id;});
 	item->nickname = nickname;
-	utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
+	utils::saveData<Friend>(1, friends, currentUser->_id);
 }
 
 void QQSystem::newFriend()
@@ -107,8 +107,8 @@ void QQSystem::newFriend()
 	tmpFriends[choice1].status = choice2;
 	//同时也应该修改对方的好友申请记录，或者说更改
 	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, static_cast<bool>(2 - choice2))) {
-		utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
-		utils::saveData<Friend>(utils::fn2, tmpFriends, currentUser->_id);
+		utils::saveData<Friend>(1, friends, currentUser->_id);
+		utils::saveData<Friend>(2, tmpFriends, currentUser->_id);
 	}
 	else std::cout << "添加失败" << std::endl;
 }
@@ -117,7 +117,7 @@ void QQSystem::newFriend()
 bool QQSystem::updateApplication(int id, Friend u, bool flag)
 {
 	//修改好友申请状态
-	std::vector<Friend> tmp = std::move(utils::readData<Friend>(utils::fn2, id));
+	std::vector<Friend> tmp = std::move(utils::readData<Friend>(2, id));
 	if (tmp.empty()) return false;
 	std::string nickname;
 	for (auto& item : tmp) {
@@ -126,11 +126,11 @@ bool QQSystem::updateApplication(int id, Friend u, bool flag)
 			break;
 		}
 	}
-	if(!utils::saveData<Friend>(utils::fn2, tmp, id))
+	if(!utils::saveData<Friend>(2, tmp, id))
 		return false;
 	//添加好友
 	if (u.status == reject || flag == false) return true;//被拒绝就不添加
-	return utils::addObj(utils::fn1, id, u);
+	return utils::addObj(1, id, u);
 }
 
 

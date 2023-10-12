@@ -14,7 +14,7 @@ void test01() {
 	QQ->users.push_back(QQUser(6, "1", "e"));
 	QQ->users.push_back(QQUser(7, "1", "f"));
 	QQ->users.push_back(QQUser(8, "1", "g"));
-	utils::saveData<QQUser>("QQUsers.txt", QQ->users);
+	utils::saveData<QQUser>(0, QQ->users);
 }
 
 void test02() {
@@ -24,25 +24,25 @@ void test02() {
 	QQ->tmpFriends.push_back({ 5, "dd", true, 0 });
 	QQ->tmpFriends.push_back({ 6, "dd", false, 2 });
 	QQ->tmpFriends.push_back({ 7, "dd", false, 0 });
-	utils::saveData<Friend>("friends.txt", QQ->friends, QQ->currentUser->_id);
-	utils::saveData<Friend>("tmpFriends.txt", QQ->tmpFriends, QQ->currentUser->_id);
+	utils::saveData<Friend>(1, QQ->friends, QQ->currentUser->_id);
+	utils::saveData<Friend>(2, QQ->tmpFriends, QQ->currentUser->_id);
 }
 
 int main() {
-	//test01();
-	//test02();
-	QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
-	QQ->friends = std::move(utils::readData<Friend>(utils::fn1, QQ->currentUser->_id));
-	QQ->tmpFriends = std::move(utils::readData<Friend>(utils::fn2, QQ->currentUser->_id));
+	test01();
+	test02();
+	QQ->users = std::move(utils::readData<QQUser>(0));
+	QQ->friends = std::move(utils::readData<Friend>(1, QQ->currentUser->_id));
+	QQ->tmpFriends = std::move(utils::readData<Friend>(2, QQ->currentUser->_id));
 	//QQ->addFriend();
 	//QQ->newFriend();
-	QQ->deleteFriend();
-	//QQ->showFriend();
+	//QQ->deleteFriend();
+	QQ->showFriend();
 	std::cout << "-----------\n";
 	//QQ->currentUser = new QQUser(7, "1", "f");
-	//QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
-	//QQ->friends = std::move(utils::readData<Friend>(utils::fn1, QQ->currentUser->_id));
-	//QQ->tmpFriends = std::move(utils::readData<Friend>(utils::fn2, QQ->currentUser->_id));
+	//QQ->users = std::move(utils::readData<QQUser>(0));
+	//QQ->friends = std::move(utils::readData<Friend>(1, QQ->currentUser->_id));
+	//QQ->tmpFriends = std::move(utils::readData<Friend>(2, QQ->currentUser->_id));
 	//QQ->newFriend();
 
 	//QQ->updateFriend();
