@@ -34,11 +34,11 @@ void QQSystem::deleteFriend()
 	int id;
 	std::cin >> id;
 	QQSystem::deleteFriend(this->friends, id);
-	utils::saveData<Friend>("friends.txt", friends, currentUser->_id);
+	utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
 	//对方的好友也要删除
-	auto targetFriends = utils::readData<Friend>("friends.txt", id);
+	auto targetFriends = utils::readData<Friend>(utils::fn1, id);
 	QQSystem::deleteFriend(targetFriends, currentUser->_id);
-	utils::saveData<Friend>("friends.txt", targetFriends, id);
+	utils::saveData<Friend>(utils::fn1, targetFriends, id);
 }
 
 bool QQSystem::deleteFriend(std::vector<Friend>& friends, int id)
@@ -50,16 +50,6 @@ bool QQSystem::deleteFriend(std::vector<Friend>& friends, int id)
 	friends.erase(it);
 	return true;
 }
-
-Friend* QQSystem::selectFriend(int id)
-{
-	auto it = find_if(friends.begin(), friends.end(), [&id](const Friend& item) {
-		return id == item.id;
-		});
-	if (it != friends.end()) return &*it;
-	else return nullptr;
-}
-
 
 
 
@@ -89,7 +79,7 @@ void QQSystem::updateFriend()
 	std::cin >> nickname;
 	auto item = utils::selectTarget(friends, id, [id](const Friend& item, int _id) {return _id == item.id;});
 	item->nickname = nickname;
-	utils::saveData<Friend>("friends.txt", friends, currentUser->_id);
+	utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
 }
 
 void QQSystem::newFriend()
@@ -114,7 +104,7 @@ void QQSystem::newFriend()
 		std::cin >> tmp.nickname;
 		friends.push_back({ tmp.id, tmp.nickname, true, agree });
 	}
-	tmpFriends[choice1].status == choice2;
+	tmpFriends[choice1].status = choice2;
 	//同时也应该修改对方的好友申请记录，或者说更改
 	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, static_cast<bool>(2 - choice2))) {
 		utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);

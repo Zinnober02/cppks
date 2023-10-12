@@ -24,6 +24,9 @@
     <ClCompile Include="QQSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="QQGroup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="QQUser.h">
@@ -33,6 +36,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="QQGroup.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,8 +3,27 @@
 #include <string>
 #include <filesystem>
 #include <sstream> 
+#include <iostream>
 #include <fstream>
 
+const int wait = 0;
+const int reject = 2;
+const int agree = 1;
+struct Friend {
+	int id;
+	std::string nickname;
+	bool flag = false;//发送为 false，接收为 true
+	int status = wait;
+
+	friend std::ostream& operator<<(std::ostream& os, const Friend& obj) {
+		os << obj.id << " " << obj.nickname << " " << obj.flag << " " << obj.status;
+		return os;
+	}
+	friend std::istream& operator>>(std::istream& is, Friend& obj) {
+		is >> obj.id >> obj.nickname >> obj.flag >> obj.status;
+		return is;
+	}
+};
 
 namespace utils {
 	const std::string fn1 = "friends.txt";

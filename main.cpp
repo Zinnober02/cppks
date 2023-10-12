@@ -39,7 +39,6 @@ int main() {
 	QQ->deleteFriend();
 	//QQ->showFriend();
 	std::cout << "-----------\n";
-
 	//QQ->currentUser = new QQUser(7, "1", "f");
 	//QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
 	//QQ->friends = std::move(utils::readData<Friend>(utils::fn1, QQ->currentUser->_id));
