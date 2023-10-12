@@ -13,7 +13,7 @@ const int agree = 1;
 struct Friend {
 	int id;
 	std::string nickname;
-	bool flag = false;
+	bool flag = false;//发送为false，接收为true
 	int status = wait;
 
 	friend std::ostream& operator<<(std::ostream& os, const Friend& obj) {
@@ -31,7 +31,6 @@ class QQSystem
 public:
 	//用户相关
 	void createUser();
-	void deleteUser();
 	QQUser* selectUser(int id);
 	void updateUser();
 	//好友相关

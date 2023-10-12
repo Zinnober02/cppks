@@ -4,8 +4,9 @@
 
 
 QQSystem* QQ = new QQSystem(new QQUser(1, "1", "ÀîÖÇ"));
+//QQSystem* QQ = new QQSystem(new QQUser(7, "1", "f"));
 void test01() {
-	QQ->users.push_back(*QQ->currentUser);
+	QQ->users.push_back(QQUser(1, "1", "ÀîÖÇ"));
 	QQ->users.push_back(QQUser(2, "1", "a"));
 	QQ->users.push_back(QQUser(3, "1", "b"));
 	QQ->users.push_back(QQUser(4, "1", "c"));
@@ -28,14 +29,25 @@ void test02() {
 }
 
 int main() {
-	test01();
+	//test01();
 	//test02();
-	//QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
-	QQ->friends = std::move(utils::readData<Friend>("friends.txt", QQ->currentUser->_id));
-	QQ->tmpFriends = std::move(utils::readData<Friend>("tmpFriends.txt", QQ->currentUser->_id));
+	QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
+	QQ->friends = std::move(utils::readData<Friend>(utils::fn1, QQ->currentUser->_id));
+	QQ->tmpFriends = std::move(utils::readData<Friend>(utils::fn2, QQ->currentUser->_id));
 	//QQ->addFriend();
-	QQ->newFriend();
-	QQ->showFriend();
+	//QQ->newFriend();
+	QQ->deleteFriend();
+	//QQ->showFriend();
+	std::cout << "-----------\n";
+
+	//QQ->currentUser = new QQUser(7, "1", "f");
+	//QQ->users = std::move(utils::readData<QQUser>("QQUsers.txt"));
+	//QQ->friends = std::move(utils::readData<Friend>(utils::fn1, QQ->currentUser->_id));
+	//QQ->tmpFriends = std::move(utils::readData<Friend>(utils::fn2, QQ->currentUser->_id));
+	//QQ->newFriend();
+
+	//QQ->updateFriend();
+	//QQ->showFriend();
 	system("pause");
 	return 0;
 }

@@ -20,11 +20,11 @@ void QQSystem::addFriend()
 	std::string nickname;
 	std::cin >> nickname;
 	tmpFriends.push_back({ id, nickname });
-	std::cout << "成功发送好友申请，等待对方同意" << std::endl;
 	//同时也要给对方的好友申请添加一个
-	updateApplication(id, { currentUser->_id, currentUser->_user_name, true }, false);
-	//QQSystem::saveFriends(currentUser->_id, tmpFriends, false);
-	utils::saveData<Friend>("tmpFriends.txt", tmpFriends, currentUser->_id);
+	Friend u = { currentUser->_id, nickname, true };
+	if (utils::addObj(utils::fn2, id, u))
+		if (utils::saveData<Friend>(utils::fn2, tmpFriends, currentUser->_id))
+			std::cout << "成功发送好友申请，等待对方同意" << std::endl;
 }
 
 void QQSystem::deleteFriend()
@@ -103,23 +103,22 @@ void QQSystem::newFriend()
 	std::cout << "申请列表" << std::endl;
 	int index = 1, choice1 = 0, choice2 = 0;
 	for (auto& item : tmpFriends)
-		std::cout << index++ << "\t" << item.nickname << "\t" << getEnumName(item) << std::endl;
+		std::cout << index++ << "\t" << item.id << "\t" << item.nickname << "\t" << getEnumName(item) << std::endl;
 	std::cout << "输入序号进行处理" << std::endl;
 	std::cin >> choice1;
 	Friend tmp = tmpFriends[--choice1];
 	std::cout << "1yes/2no" << std::endl;
 	std::cin >> choice2;
 	if (choice2 == 1) {
-		std::string nickname;
 		std::cout << "请输入备注" << std::endl;
-		std::cin >> nickname;
-		friends.push_back({ tmp.id, nickname, true, agree });
+		std::cin >> tmp.nickname;
+		friends.push_back({ tmp.id, tmp.nickname, true, agree });
 	}
 	tmpFriends[choice1].status == choice2;
 	//同时也应该修改对方的好友申请记录，或者说更改
 	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, static_cast<bool>(2 - choice2))) {
-		utils::saveData<Friend>("friends.txt", friends, currentUser->_id);
-		utils::saveData<Friend>("tmpFriends.txt", tmpFriends, currentUser->_id);
+		utils::saveData<Friend>(utils::fn1, friends, currentUser->_id);
+		utils::saveData<Friend>(utils::fn2, tmpFriends, currentUser->_id);
 	}
 	else std::cout << "添加失败" << std::endl;
 }

@@ -36,12 +36,14 @@ namespace utils {
 	std::vector<T> readData(std::string filename, int id = 0) {
 		//相对路径  ./账号
 		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = id ? (current_dir / "flies" / std::to_string(id)) : (current_dir / "flies");
+		std::filesystem::path dir_path = id ? (current_dir / "files" / std::to_string(id)) : (current_dir / "files");
 		if (!std::filesystem::exists(dir_path)) {
 			std::filesystem::create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
 		}
 		std::vector<T> list;
+		std::ofstream tmpFile(dir_path / filename, std::ios::app);
+		tmpFile.close();
 		std::ifstream file(dir_path / filename, std::ios::in);
 		if (file.is_open()) {
 			std::string line;
@@ -54,7 +56,7 @@ namespace utils {
 			file.close();
 		}
 		else {
-			std::cerr << "无法打开文件进行写入: " << dir_path / filename << std::endl;
+			std::cerr << "无法打开文件进行读取: " << dir_path / filename << std::endl;
 			return std::vector<T>();
 		}
 		return list;
@@ -65,7 +67,7 @@ namespace utils {
 	bool addObj(std::string filename, int id, T& u) {
 		//相对路径  ./账号
 		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = current_dir / "flies" / std::to_string(id);
+		std::filesystem::path dir_path = current_dir / "files" / std::to_string(id);
 		if (!std::filesystem::exists(dir_path)) {
 			std::filesystem::create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
