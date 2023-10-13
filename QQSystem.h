@@ -20,7 +20,6 @@ public:
 	//好友相关
 	void addFriend();
 	void deleteFriend();
-	static bool deleteFriend(std::vector<Friend>& friends, int id);
 	void showFriend(); 
 	void updateFriend();
 	void newFriend();
@@ -30,10 +29,10 @@ public:
 	//群相关
 	void addGroup();
 	void deleteGroup();
-	static bool deleteGroup(std::vector<Friend>& groups, int id);
-	void showGroup();
+	void newGroup();
+	QQGroup* showGroup();
 	void updateGroup();
-	static void newGroup(QQGroup* group, Friend user);
+	void newGroup(QQGroup* group, int admin);
 	void readGroups();
 //private:
 	QQSystem(QQUser* user) : currentUser(user) {};
