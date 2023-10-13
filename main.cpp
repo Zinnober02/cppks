@@ -3,8 +3,8 @@
 
 
 
-//QQSystem* QQ = new QQSystem(new QQUser(1, "1", "ÀîÖÇ"));
-QQSystem* QQ = new QQSystem(new QQUser(2, "1", "aa"));
+QQSystem* QQ = new QQSystem(new QQUser(1, "1", "ÀîÖÇ"));
+//QQSystem* QQ = new QQSystem(new QQUser(2, "1", "aa"));
 void test01() {
 	QQ->users.push_back(QQUser(1, "1", "ÀîÖÇ"));
 	QQ->users.push_back(QQUser(2, "1", "a"));
@@ -51,7 +51,8 @@ int main() {
 	//QQ->newFriend();
 	//QQ->deleteFriend();
 	//QQ->showFriend();
-	QQ->showGroup();
+	//QQ->showGroup();
+	QQ->deleteGroup();
 	//QQ->addGroup();
 	std::cout << "-----------\n";
 	//QQ->currentUser = new QQUser(7, "1", "f");
