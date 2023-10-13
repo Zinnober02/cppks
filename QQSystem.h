@@ -24,15 +24,24 @@ public:
 	void showFriend(); 
 	void updateFriend();
 	void newFriend();
-	bool updateApplication(int id, Friend u, bool flag = true);//更新被申请对象的申请列表
-	std::string getEnumName(const Friend& a);
+
+	static bool updateApplication(int id, Friend u, bool flag = true, bool kind = true);//更新被申请对象的申请列表
+
+	//群相关
+	void addGroup();
+	void deleteGroup();
+	static bool deleteGroup(std::vector<Friend>& groups, int id);
+	void showGroup();
+	void updateGroup();
+	static void newGroup(QQGroup* group, Friend user);
+	void readGroups();
 //private:
 	QQSystem(QQUser* user) : currentUser(user) {};
 	QQUser* currentUser;
 	std::vector<QQUser> users;
-	std::vector<QQGroup> addGroups;//所有群
-	std::vector<QQGroup> myGroups;//个人加入的群
-	std::vector<QQGroup> tmpGroups;
+	std::vector<QQGroup> allGroups;//所有群
+	std::vector<Friend> myGroups;//个人加入的群
+	std::vector<Friend> tmpGroups;
 	std::vector<Friend> friends;
 	std::vector<Friend> tmpFriends;
 };
