@@ -9,37 +9,51 @@
 const int wait = 0;
 const int reject = 2;
 const int agree = 1;
+
 struct Friend {
 	int id;
-	std::string nickname;
+	std::string nickname;//备注或者群昵称
 	bool flag = false;//发送为 false，接收为 true
 	int status = wait;
+	int admin = 0;//管理员权限， 0成员 1管理员，2群主
 
 	friend std::ostream& operator<<(std::ostream& os, const Friend& obj) {
-		os << obj.id << " " << obj.nickname << " " << obj.flag << " " << obj.status;
+		os << obj.id << " " << obj.nickname << " " << obj.flag << " " << obj.status << " " << obj.admin;
 		return os;
 	}
 	friend std::istream& operator>>(std::istream& is, Friend& obj) {
-		is >> obj.id >> obj.nickname >> obj.flag >> obj.status;
+		is >> obj.id >> obj.nickname >> obj.flag >> obj.status >> obj.admin;
 		return is;
+	}
+	static std::string getEnumName(const Friend& a)
+	{
+		if (a.status == wait) return a.flag ? "等待同意" : "等待对方同意";
+		if (a.status == reject) return a.flag ? "已拒绝" : "已被拒绝";
+		return "已同意";
 	}
 };
 
 namespace utils {
-	const std::string filename[6] =
-	{"QQUsers.txt", "friends.txt", "tmpFriends.txt",  "QQGroups.txt", "groups.txt", "tmpGroups.txt"};
+	using namespace std::filesystem;
+	const int length = 8;
 
+	
+
+	const std::string filename[length] =
+	{"QQUsers.txt", "friends.txt", "tmpFriends.txt",  "QQGroups.txt", "groups.txt", "tmpGroups.txt", "members.txt", "tmpMembers.txt"};
+	//     0                        1                    2                            3                       4                     5                           6                       7
 
 	template<class T>
-	bool saveData(int index, const std::vector<T>& data, int id = 0)
+	bool saveData(int index, bool flag,const std::vector<T>& data, int id = 0)
 	{
 		//相对路径  ./账号
-		std::string path = index < 6 ? "QQ" : "WeChat";
-		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = 
-			id ? current_dir / "files" / path / std::to_string(id) : current_dir / "files" / path;
-		if (!std::filesystem::exists(dir_path))
-			std::filesystem::create_directories(dir_path);
+		std::string item = index < length ? "QQ" : "WeChat";
+		std::string item1 = flag ? "users" : "groups";
+		path current_dir = current_path();
+		path dir_path = 
+			id ? current_dir / "files" / item / item1 / std::to_string(id) : current_dir / "files" / item / item1;
+		if (!exists(dir_path))
+			create_directories(dir_path);
 		std::ofstream file(dir_path / filename[index], std::ios::out);
 
 		if (file.is_open()) {
@@ -55,14 +69,15 @@ namespace utils {
 	}
 
 	template <class T>
-	std::vector<T> readData(int index, int id = 0) {
+	std::vector<T> readData(int index, bool flag, int id = 0) {
 		//相对路径  ./账号
-		std::string path = index < 6 ? "QQ" : "WeChat";
-		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = 
-			id ? current_dir / "files" / path / std::to_string(id) : current_dir / "files" / path;
-		if (!std::filesystem::exists(dir_path)) {
-			std::filesystem::create_directories(dir_path);
+		std::string item = index < length ? "QQ" : "WeChat";
+		std::string item1 = flag ? "users" : "groups";
+		path current_dir = current_path();
+		path dir_path = 
+			id ? current_dir / "files" / item / item1 / std::to_string(id) : current_dir / "files" / item / item1;
+		if (!exists(dir_path)) {
+			create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
 		}
 		std::vector<T> list;
@@ -88,13 +103,14 @@ namespace utils {
 
 
 	template<class T>
-	bool addObj(int index, int id, T& u) {
+	bool addObj(int index, bool flag, int id, T& u) {
 		//相对路径  ./账号
-		std::string path = index < 6 ? "QQ" : "WeChat";
-		std::filesystem::path current_dir = std::filesystem::current_path();
-		std::filesystem::path dir_path = current_dir / "files" / path / std::to_string(id);
-		if (!std::filesystem::exists(dir_path)) {
-			std::filesystem::create_directories(dir_path);
+		std::string item = index < length ? "QQ" : "WeChat";
+		std::string item1 = flag ? "users" : "groups";
+		path current_dir = current_path();
+		path dir_path = current_dir / "files" / item / item1 / std::to_string(id);
+		if (!exists(dir_path)) {
+			create_directories(dir_path);
 			std::cout << "成功创建目录" << std::endl;
 		}
 		std::ofstream file(dir_path / filename[index], std::ios::app);
