@@ -33,24 +33,19 @@ void QQSystem::deleteFriend()
 	std::cout << "请输入QQ号" << std::endl;
 	int id;
 	std::cin >> id;
-	QQSystem::deleteFriend(this->friends, id);
-	utils::saveData<Friend>(1, 1, friends, currentUser->_id);
+	auto cmp = [](const Friend& item, int _id) {return _id == item.id; };
+	auto it1 = utils::selectIterator(friends, id, cmp);
 	//对方的好友也要删除
 	auto targetFriends = utils::readData<Friend>(1, 1, id);
-	QQSystem::deleteFriend(targetFriends, currentUser->_id);
-	utils::saveData<Friend>(1, 1, targetFriends, id);
+	auto it2 = utils::selectIterator(targetFriends, id, cmp);
+	if (it1 != friends.end() && it2 != targetFriends.end()) {
+		friends.erase(it1);
+		targetFriends.erase(it2);
+		utils::saveData<Friend>(1, 1, friends, currentUser->_id);
+		utils::saveData<Friend>(1, 1, targetFriends, id);
+	}
+	else std::cout << "无法删除\n";
 }
-
-bool QQSystem::deleteFriend(std::vector<Friend>& friends, int id)
-{
-	auto it = find_if(friends.begin(), friends.end(), [&id](const Friend& item) {
-		return id == item.id;
-		});
-	if (it == friends.end()) return false;
-	friends.erase(it);
-	return true;
-}
-
 
 
 void QQSystem::showFriend()
@@ -156,9 +151,50 @@ void QQSystem::addGroup()
 			std::cout << "成功发送入群申请，等待管理员审核" << std::endl;
 }
 
-void QQSystem::showGroup()
+void QQSystem::deleteGroup()
 {
 	if (myGroups.empty()) return;
+	std::cout << currentUser->_user_name << "的群列表" << std::endl;
+	int index = 1, choice = 0;
+	for (auto& group : myGroups) {
+		std::cout << index++ << "\t" << group.id << "\t" << group.nickname << std::endl;
+	}
+	std::cout << "输入要退出的群序号" << std::endl;
+	std::cin >> choice;
+	assert(choice <= myGroups.size());
+	//在我的群中找到要退出的群
+	auto it1 = std::next(myGroups.begin(), --choice);
+	//通过id读取该群信息和成员
+	auto group = utils::selectTarget(allGroups, it1->id, [](const QQGroup& item, int _id) {return _id == item.id; });
+	group->members = std::move(utils::readData<Friend>(6, 0, it1->id));
+	
+	//在要退出的群成员中找到我
+	auto it2 = utils::selectIterator(group->members, currentUser->_id, [](const Friend& item, int _id) {return _id == item.id; });
+	
+	if (it1 != myGroups.end() && it2 != group->members.end()) {
+		myGroups.erase(it1);
+		group->members.erase(it2);
+		utils::saveData<Friend>(4, 1, myGroups, currentUser->_id);
+		utils::saveData<Friend>(6, 0, group->members, group->id);
+	}
+	else std::cout << "退出失败\n";
+}
+
+void QQSystem::newGroup()
+{
+	auto group = showGroup();
+	if (!group) return;
+	std::cout << *group << std::endl;
+	for (auto member : group->members) {
+		std::cout << member << std::endl;
+	}
+	auto g = utils::selectIterator(myGroups, group->id, [](const Friend& item, int _id) {return item.id == _id; });
+	newGroup(group, g->admin);
+}
+
+QQGroup* QQSystem::showGroup()
+{
+	if (myGroups.empty()) return nullptr;
 	std::cout << currentUser->_user_name << "的群列表" << std::endl;
 	int index = 1, choice = 0;
 	for (auto& group : myGroups) {
@@ -171,17 +207,13 @@ void QQSystem::showGroup()
 	//通过id读取该群信息和成员
 	auto group = utils::selectTarget(allGroups, g.id, [](const QQGroup& item, int _id) {return _id == item.id; });
 	group->members = std::move(utils::readData<Friend>(6, 0, g.id));
-	std::cout << *group << std::endl;
-	for (auto member : group->members) {
-		std::cout << member << std::endl;
-	}
-	newGroup(group, g);
+	return group;
 }
 
-void QQSystem::newGroup(QQGroup* group, Friend user)
+void QQSystem::newGroup(QQGroup* group, int admin)
 {
 	std::vector<Friend> tmpMembers;
-	if (user.admin) {
+	if (admin) {
 		std::cout << "你是该群管理员\n";
 		tmpMembers = utils::readData<Friend>(7, 0, group->id);
 	}
@@ -202,7 +234,7 @@ void QQSystem::newGroup(QQGroup* group, Friend user)
 	std::cout << "1yes/2no" << std::endl;
 	std::cin >> choice2;
 	if (choice2 == 1) {
-		if (user.admin == 2) {
+		if (admin == 2) {
 			std::cout << "是否设置为管理员？1yes/2no\n";
 			std::cin >> choice3;
 		}
@@ -210,7 +242,7 @@ void QQSystem::newGroup(QQGroup* group, Friend user)
 	}
 	tmp->status = choice2;
 	//同时也应该修改对方的申请记录
-	if (updateApplication(tmp->id, { user.id, tmp->nickname, false, choice2, choice3 }, 2 - choice2, false)) {
+	if (updateApplication(tmp->id, { currentUser->_id, tmp->nickname, false, choice2, choice3 }, 2 - choice2, false)) {
 		utils::saveData<Friend>(6, 0, group->members, group->id);
 		utils::saveData<Friend>(7, 0, tmpMembers, group->id);
 	}
