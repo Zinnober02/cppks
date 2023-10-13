@@ -134,4 +134,12 @@ namespace utils {
 		if (it != list.end()) return &*it;
 		else return nullptr;
 	}
+	template<class T, typename Cmp>
+	std::vector<T>::iterator selectIterator(std::vector<T>& list, int id, Cmp cmp)
+	{
+		auto it = find_if(list.begin(), list.end(), [&id, &cmp](const T& item) {
+			return cmp(item, id);
+			});
+		return it;
+	}
 }
