@@ -22,8 +22,8 @@ void QQSystem::addFriend()
 	tmpFriends.push_back({ id, nickname });
 	//同时也要给对方的好友申请添加一个
 	Friend u = { currentUser->_id, nickname, true };
-	if (utils::addObj(2, id, u))
-		if (utils::saveData<Friend>(2, tmpFriends, currentUser->_id))
+	if (utils::addObj(2, 1, id, u))
+		if (utils::saveData<Friend>(2, 1, tmpFriends, currentUser->_id))
 			std::cout << "成功发送好友申请，等待对方同意" << std::endl;
 }
 
@@ -34,11 +34,11 @@ void QQSystem::deleteFriend()
 	int id;
 	std::cin >> id;
 	QQSystem::deleteFriend(this->friends, id);
-	utils::saveData<Friend>(1, friends, currentUser->_id);
+	utils::saveData<Friend>(1, 1, friends, currentUser->_id);
 	//对方的好友也要删除
-	auto targetFriends = utils::readData<Friend>(1, id);
+	auto targetFriends = utils::readData<Friend>(1, 1, id);
 	QQSystem::deleteFriend(targetFriends, currentUser->_id);
-	utils::saveData<Friend>(1, targetFriends, id);
+	utils::saveData<Friend>(1, 1, targetFriends, id);
 }
 
 bool QQSystem::deleteFriend(std::vector<Friend>& friends, int id)
@@ -79,7 +79,7 @@ void QQSystem::updateFriend()
 	std::cin >> nickname;
 	auto item = utils::selectTarget(friends, id, [id](const Friend& item, int _id) {return _id == item.id;});
 	item->nickname = nickname;
-	utils::saveData<Friend>(1, friends, currentUser->_id);
+	utils::saveData<Friend>(1, 1, friends, currentUser->_id);
 }
 
 void QQSystem::newFriend()
@@ -93,7 +93,7 @@ void QQSystem::newFriend()
 	std::cout << "申请列表" << std::endl;
 	int index = 1, choice1 = 0, choice2 = 0;
 	for (auto& item : tmpFriends)
-		std::cout << index++ << "\t" << item.id << "\t" << item.nickname << "\t" << getEnumName(item) << std::endl;
+		std::cout << index++ << "\t" << item.id << "\t" << item.nickname << "\t" << Friend::getEnumName(item) << std::endl;
 	std::cout << "输入序号进行处理" << std::endl;
 	std::cin >> choice1;
 	Friend tmp = tmpFriends[--choice1];
@@ -106,18 +106,19 @@ void QQSystem::newFriend()
 	}
 	tmpFriends[choice1].status = choice2;
 	//同时也应该修改对方的好友申请记录，或者说更改
-	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, static_cast<bool>(2 - choice2))) {
-		utils::saveData<Friend>(1, friends, currentUser->_id);
-		utils::saveData<Friend>(2, tmpFriends, currentUser->_id);
+	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, 2 - choice2)) {
+		utils::saveData<Friend>(1, 1, friends, currentUser->_id);
+		utils::saveData<Friend>(2, 1, tmpFriends, currentUser->_id);
 	}
 	else std::cout << "添加失败" << std::endl;
 }
 
 
-bool QQSystem::updateApplication(int id, Friend u, bool flag)
+bool QQSystem::updateApplication(int id, Friend u, bool flag, bool kind)
 {
-	//修改好友申请状态
-	std::vector<Friend> tmp = std::move(utils::readData<Friend>(2, id));
+	//修改申请状态
+	std::vector<Friend> tmp = 
+		std::move(kind ? utils::readData<Friend>(2, 1, id) : utils::readData<Friend>(5, 1, id));
 	if (tmp.empty()) return false;
 	std::string nickname;
 	for (auto& item : tmp) {
@@ -126,18 +127,100 @@ bool QQSystem::updateApplication(int id, Friend u, bool flag)
 			break;
 		}
 	}
-	if(!utils::saveData<Friend>(2, tmp, id))
+	if(!(kind ? utils::saveData<Friend>(2, 1, tmp, id) : utils::saveData<Friend>(5, 1, tmp, id)))
 		return false;
-	//添加好友
+	//添加
 	if (u.status == reject || flag == false) return true;//被拒绝就不添加
-	return utils::addObj(1, id, u);
+	return kind ? utils::addObj(1, 1, id, u) : utils::addObj(4, 1, id, u);
 }
 
 
 
-std::string QQSystem::getEnumName(const Friend& a)
+
+
+void QQSystem::addGroup()
 {
-	if (a.status == wait) return a.flag ? "等待同意" : "等待对方同意";
-	if (a.status == reject) return a.flag ? "已拒绝" :  "已被拒绝";
-	return "已同意";
+	std::cout << "请输入群号" << std::endl;
+	int id;
+	std::cin >> id;
+	auto group = utils::selectTarget(allGroups, id, [id](const QQGroup& item, int _id) {return _id == item.id; });
+	assert(group != nullptr);
+	std::cout << "请输入群昵称" << std::endl;
+	std::string nickname;
+	std::cin >> nickname;
+	tmpGroups.push_back({ id, nickname });
+	//同时也要给对应群的申请添加一个
+	Friend u = { currentUser->_id, nickname, true };
+	if (utils::addObj(7, 0, id, u))
+		if (utils::saveData<Friend>(5, 1, tmpGroups, currentUser->_id))
+			std::cout << "成功发送入群申请，等待管理员审核" << std::endl;
+}
+
+void QQSystem::showGroup()
+{
+	if (myGroups.empty()) return;
+	std::cout << currentUser->_user_name << "的群列表" << std::endl;
+	int index = 1, choice = 0;
+	for (auto& group : myGroups) {
+		std::cout << index++ << "\t" << group.id << "\t" << group.nickname << std::endl;
+	}
+	std::cout << "输入序号查看详细信息" << std::endl;
+	std::cin >> choice;
+	assert(choice <= myGroups.size());
+	auto g = myGroups[--choice];
+	//通过id读取该群信息和成员
+	auto group = utils::selectTarget(allGroups, g.id, [](const QQGroup& item, int _id) {return _id == item.id; });
+	group->members = std::move(utils::readData<Friend>(6, 0, g.id));
+	std::cout << *group << std::endl;
+	for (auto member : group->members) {
+		std::cout << member << std::endl;
+	}
+	newGroup(group, g);
+}
+
+void QQSystem::newGroup(QQGroup* group, Friend user)
+{
+	std::vector<Friend> tmpMembers;
+	if (user.admin) {
+		std::cout << "你是该群管理员\n";
+		tmpMembers = utils::readData<Friend>(7, 0, group->id);
+	}
+	if (tmpMembers.empty()) {
+		std::cout << "没有入群申请" << std::endl;
+		Sleep(1000);
+		return;
+	}
+
+	std::cout << "申请列表" << std::endl;
+	int index = 1, choice1 = 0, choice2 = 0, choice3 = 0;
+	std::cout << "序号\t" << "QQ号\t" << "状态\n";
+	for (auto& item : tmpMembers)
+		std::cout << index++ << "\t" << item.id  << "\t" << Friend::getEnumName(item) << std::endl;
+	std::cout << "输入序号进行处理" << std::endl;
+	std::cin >> choice1;
+	Friend* tmp = &tmpMembers[--choice1];
+	std::cout << "1yes/2no" << std::endl;
+	std::cin >> choice2;
+	if (choice2 == 1) {
+		if (user.admin == 2) {
+			std::cout << "是否设置为管理员？1yes/2no\n";
+			std::cin >> choice3;
+		}
+		group->members.push_back({ tmp->id, tmp->nickname, true, agree, 2 - choice3 });
+	}
+	tmp->status = choice2;
+	//同时也应该修改对方的申请记录
+	if (updateApplication(tmp->id, { user.id, tmp->nickname, false, choice2, choice3 }, 2 - choice2, false)) {
+		utils::saveData<Friend>(6, 0, group->members, group->id);
+		utils::saveData<Friend>(7, 0, tmpMembers, group->id);
+	}
+	else std::cout << "添加失败" << std::endl;
+}
+
+void QQSystem::readGroups()
+{
+	allGroups = utils::readData<QQGroup>(3, 0);
+	for (auto& group : allGroups) {
+		group.members = std::move(utils::readData<Friend>(6, 0, group.id));
+	}
 }
