@@ -1,8 +1,11 @@
 #include "QQSystem.h"
 #include <cassert>
-QQUser* QQSystem::selectUser(int id)
+
+QQSystem* QQSystem::QQ = new QQSystem();
+
+User* QQSystem::selectUser(int id)
 {
-	auto it = find_if(users.begin(), users.end(), [&id](const QQUser& user) {
+	auto it = find_if(users.begin(), users.end(), [&id](const User& user) {
 		return id == user._id;
 		});
 	if (it != users.end()) return &*it;
@@ -22,8 +25,8 @@ void QQSystem::addFriend()
 	tmpFriends.push_back({ id, nickname });
 	//同时也要给对方的好友申请添加一个
 	Friend u = { currentUser->_id, nickname, true };
-	if (utils::addObj(2, 1, id, u))
-		if (utils::saveData<Friend>(2, 1, tmpFriends, currentUser->_id))
+	if (addFriend(id, u))
+		if (saveFriends(currentUser->_id, tmpFriends))
 			std::cout << "成功发送好友申请，等待对方同意" << std::endl;
 }
 
@@ -36,13 +39,14 @@ void QQSystem::deleteFriend()
 	auto cmp = [](const Friend& item, int _id) {return _id == item.id; };
 	auto it1 = utils::selectIterator(friends, id, cmp);
 	//对方的好友也要删除
-	auto targetFriends = utils::readData<Friend>(1, 1, id);
+	//auto targetFriends = utils::readData<Friend>(1, 1, id);
+	auto targetFriends = readFriends(id);
 	auto it2 = utils::selectIterator(targetFriends, id, cmp);
 	if (it1 != friends.end() && it2 != targetFriends.end()) {
 		friends.erase(it1);
 		targetFriends.erase(it2);
-		utils::saveData<Friend>(1, 1, friends, currentUser->_id);
-		utils::saveData<Friend>(1, 1, targetFriends, id);
+		saveFriends(currentUser->_id, friends);
+		saveFriends(id, targetFriends);
 	}
 	else std::cout << "无法删除\n";
 }
@@ -74,7 +78,7 @@ void QQSystem::updateFriend()
 	std::cin >> nickname;
 	auto item = utils::selectTarget(friends, id, [id](const Friend& item, int _id) {return _id == item.id;});
 	item->nickname = nickname;
-	utils::saveData<Friend>(1, 1, friends, currentUser->_id);
+	saveFriends(currentUser->_id, friends);
 }
 
 void QQSystem::newFriend()
@@ -102,8 +106,8 @@ void QQSystem::newFriend()
 	tmpFriends[choice1].status = choice2;
 	//同时也应该修改对方的好友申请记录，或者说更改
 	if (updateApplication(tmp.id, { currentUser->_id, tmp.nickname, false, choice2 }, 2 - choice2)) {
-		utils::saveData<Friend>(1, 1, friends, currentUser->_id);
-		utils::saveData<Friend>(2, 1, tmpFriends, currentUser->_id);
+		saveFriends(currentUser->_id, friends);
+		saveTmpFriends(currentUser->_id, tmpFriends);
 	}
 	else std::cout << "添加失败" << std::endl;
 }
@@ -113,7 +117,7 @@ bool QQSystem::updateApplication(int id, Friend u, bool flag, bool kind)
 {
 	//修改申请状态
 	std::vector<Friend> tmp = 
-		std::move(kind ? utils::readData<Friend>(2, 1, id) : utils::readData<Friend>(5, 1, id));
+		kind ? readTmpFriends(id) : readTmpGroups(id);
 	if (tmp.empty()) return false;
 	std::string nickname;
 	for (auto& item : tmp) {
@@ -122,11 +126,11 @@ bool QQSystem::updateApplication(int id, Friend u, bool flag, bool kind)
 			break;
 		}
 	}
-	if(!(kind ? utils::saveData<Friend>(2, 1, tmp, id) : utils::saveData<Friend>(5, 1, tmp, id)))
+	if(!(kind ? saveTmpFriends(id, tmp) : saveTmpGroups(id, tmp)))
 		return false;
 	//添加
 	if (u.status == reject || flag == false) return true;//被拒绝就不添加
-	return kind ? utils::addObj(1, 1, id, u) : utils::addObj(4, 1, id, u);
+	return kind ? addFriend(id, u) : addGroup(id, u);
 }
 
 
@@ -146,8 +150,8 @@ void QQSystem::addGroup()
 	tmpGroups.push_back({ id, nickname });
 	//同时也要给对应群的申请添加一个
 	Friend u = { currentUser->_id, nickname, true };
-	if (utils::addObj(7, 0, id, u))
-		if (utils::saveData<Friend>(5, 1, tmpGroups, currentUser->_id))
+	if (addTmpGroup(id, u))
+		if (saveTmpGroups(currentUser->_id, tmpGroups))
 			std::cout << "成功发送入群申请，等待管理员审核" << std::endl;
 }
 
@@ -166,7 +170,7 @@ void QQSystem::deleteGroup()
 	auto it1 = std::next(myGroups.begin(), --choice);
 	//通过id读取该群信息和成员
 	auto group = utils::selectTarget(allGroups, it1->id, [](const QQGroup& item, int _id) {return _id == item.id; });
-	group->members = std::move(utils::readData<Friend>(6, 0, it1->id));
+	group->members = readMembers(it1->id);
 	
 	//在要退出的群成员中找到我
 	auto it2 = utils::selectIterator(group->members, currentUser->_id, [](const Friend& item, int _id) {return _id == item.id; });
@@ -174,8 +178,8 @@ void QQSystem::deleteGroup()
 	if (it1 != myGroups.end() && it2 != group->members.end()) {
 		myGroups.erase(it1);
 		group->members.erase(it2);
-		utils::saveData<Friend>(4, 1, myGroups, currentUser->_id);
-		utils::saveData<Friend>(6, 0, group->members, group->id);
+		saveGroups(currentUser->_id, myGroups);
+		saveMembers(group->id, group->members);
 	}
 	else std::cout << "退出失败\n";
 }
@@ -185,7 +189,7 @@ void QQSystem::newGroup()
 	auto group = showGroup();
 	if (!group) return;
 	std::cout << *group << std::endl;
-	for (auto member : group->members) {
+	for (auto& member : group->members) {
 		std::cout << member << std::endl;
 	}
 	auto g = utils::selectIterator(myGroups, group->id, [](const Friend& item, int _id) {return item.id == _id; });
@@ -203,10 +207,10 @@ QQGroup* QQSystem::showGroup()
 	std::cout << "输入序号查看详细信息" << std::endl;
 	std::cin >> choice;
 	assert(choice <= myGroups.size());
-	auto g = myGroups[--choice];
+	auto& g = myGroups[--choice];
 	//通过id读取该群信息和成员
 	auto group = utils::selectTarget(allGroups, g.id, [](const QQGroup& item, int _id) {return _id == item.id; });
-	group->members = std::move(utils::readData<Friend>(6, 0, g.id));
+	group->members = readMembers(g.id);
 	return group;
 }
 
@@ -215,7 +219,7 @@ void QQSystem::newGroup(QQGroup* group, int admin)
 	std::vector<Friend> tmpMembers;
 	if (admin) {
 		std::cout << "你是该群管理员\n";
-		tmpMembers = utils::readData<Friend>(7, 0, group->id);
+		tmpMembers = readTmpMembers(group->id);
 	}
 	if (tmpMembers.empty()) {
 		std::cout << "没有入群申请" << std::endl;
@@ -243,16 +247,111 @@ void QQSystem::newGroup(QQGroup* group, int admin)
 	tmp->status = choice2;
 	//同时也应该修改对方的申请记录
 	if (updateApplication(tmp->id, { currentUser->_id, tmp->nickname, false, choice2, choice3 }, 2 - choice2, false)) {
-		utils::saveData<Friend>(6, 0, group->members, group->id);
-		utils::saveData<Friend>(7, 0, tmpMembers, group->id);
+		saveMembers(group->id, group->members);
+		saveTmpMembers(group->id, tmpMembers);
 	}
 	else std::cout << "添加失败" << std::endl;
 }
 
 void QQSystem::readGroups()
 {
-	allGroups = utils::readData<QQGroup>(3, 0);
-	for (auto& group : allGroups) {
-		group.members = std::move(utils::readData<Friend>(6, 0, group.id));
-	}
+	allGroups = utils::readData<QQGroup>(utils::QQ, utils::groups, 3);
+	/*for (auto& group : allGroups) {
+		group.members = readMembers(group.id);
+	}*/
+}
+
+std::vector<Friend> QQSystem::readTmpGroups(int user_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::users, 5, user_id);
+}
+
+std::vector<Friend> QQSystem::readMembers(int group_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::groups, 6, group_id);
+}
+
+std::vector<Friend> QQSystem::readTmpMembers(int group_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::groups, 7, group_id);
+}
+
+bool QQSystem::saveGroups(int user_id, std::vector<Friend> myGroups)
+{
+	return utils::saveData<Friend>(myGroups, utils::QQ, utils::users, 4, user_id);
+}
+
+bool QQSystem::saveFriends(int user_id, std::vector<Friend> friends)
+{
+	return utils::saveData<Friend>(friends, utils::QQ, utils::users, 1, user_id);
+}
+
+bool QQSystem::saveTmpFriends(int user_id, std::vector<Friend> tmpFriends)
+{
+	return utils::saveData<Friend>(tmpFriends, utils::QQ, utils::users, 2, user_id);
+}
+
+bool QQSystem::saveTmpGroups(int user_id, std::vector<Friend> tmpGroups)
+{
+	return utils::saveData<Friend>(tmpGroups, utils::QQ, utils::users, 5, user_id);
+}
+
+bool QQSystem::saveMembers(int group_id, std::vector<Friend> members)
+{
+	return utils::saveData<Friend>(members, utils::QQ, utils::groups, 6, group_id);
+}
+
+bool QQSystem::saveTmpMembers(int group_id, std::vector<Friend> tmpMembers)
+{
+	return utils::saveData<Friend>(tmpMembers, utils::QQ, utils::groups, 7, group_id);
+}
+
+QQSystem* QQSystem::getInstance()
+{
+	return QQ;
+}
+
+void QQSystem::setUser(User* user)
+{
+	currentUser = user;
+}
+
+void QQSystem::readUsers()
+{
+	users = utils::readData<User>(utils::QQ, utils::users, 0);
+}
+
+bool QQSystem::addFriend(int user_id, Friend newFriend)
+{
+	return utils::addObj(utils::QQ, utils::users, 1, user_id);
+}
+
+bool QQSystem::addTmpFriend(int user_id, Friend newFriend)
+{
+	return utils::addObj(utils::QQ, utils::users, 2, user_id);
+}
+
+bool QQSystem::addGroup(int user_id, Friend newGroup)
+{
+	return utils::addObj(utils::QQ, utils::users, 4, user_id);
+}
+
+bool QQSystem::addTmpGroup(int user_id, Friend newGroup)
+{
+	return utils::addObj(utils::QQ, utils::users, 7, user_id);
+}
+
+std::vector<Friend> QQSystem::readGroups(int user_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::users, 4, user_id);
+}
+
+std::vector<Friend> QQSystem::readFriends(int user_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::users, 1, user_id);
+}
+
+std::vector<Friend> QQSystem::readTmpFriends(int user_id)
+{
+	return utils::readData<Friend>(utils::QQ, utils::users, 2, user_id);
 }

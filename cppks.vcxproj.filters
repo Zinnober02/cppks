@@ -18,7 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="QQUser.cpp">
+    <ClCompile Include="User.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="QQSystem.cpp">
@@ -27,9 +27,18 @@
     <ClCompile Include="QQGroup.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="blog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WeiBoSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="QQUser.h">
+    <ClInclude Include="User.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="QQSystem.h">
@@ -39,6 +48,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="QQGroup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="blog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WeiBoSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

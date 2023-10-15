@@ -54,6 +54,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\ImageContentTask.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\lc.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\marmasm.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\MeshContentTask.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\ShaderGraphContentTask.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -128,18 +134,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="blog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QQGroup.cpp" />
     <ClCompile Include="QQSystem.cpp" />
-    <ClCompile Include="QQUser.cpp" />
+    <ClCompile Include="User.cpp" />
+    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="WeiBoSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="blog.h" />
     <ClInclude Include="QQGroup.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="QQSystem.h" />
-    <ClInclude Include="QQUser.h" />
+    <ClInclude Include="User.h" />
+    <ClInclude Include="WeiBoSystem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\ImageContentTask.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\lc.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\marmasm.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\MeshContentTask.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\ShaderGraphContentTask.targets" />
   </ImportGroup>
 </Project>
