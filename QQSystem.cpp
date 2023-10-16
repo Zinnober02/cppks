@@ -116,8 +116,7 @@ void QQSystem::newFriend()
 bool QQSystem::updateApplication(int id, Friend u, bool flag, bool kind)
 {
 	//ÐÞ¸ÄÉêÇë×´Ì¬
-	std::vector<Friend> tmp = 
-		kind ? readTmpFriends(id) : readTmpGroups(id);
+	std::vector<Friend> tmp = kind ? readTmpFriends(id) : readTmpGroups(id);
 	if (tmp.empty()) return false;
 	std::string nickname;
 	for (auto& item : tmp) {
@@ -323,22 +322,22 @@ void QQSystem::readUsers()
 
 bool QQSystem::addFriend(int user_id, Friend newFriend)
 {
-	return utils::addObj(utils::QQ, utils::users, 1, user_id);
+	return utils::addObj(newFriend, utils::QQ, utils::users, 1, user_id);
 }
 
 bool QQSystem::addTmpFriend(int user_id, Friend newFriend)
 {
-	return utils::addObj(utils::QQ, utils::users, 2, user_id);
+	return utils::addObj(newFriend, utils::QQ, utils::users, 2, user_id);
 }
 
 bool QQSystem::addGroup(int user_id, Friend newGroup)
 {
-	return utils::addObj(utils::QQ, utils::users, 4, user_id);
+	return utils::addObj(newGroup, utils::QQ, utils::users, 4, user_id);
 }
 
 bool QQSystem::addTmpGroup(int user_id, Friend newGroup)
 {
-	return utils::addObj(utils::QQ, utils::users, 7, user_id);
+	return utils::addObj(newGroup, utils::QQ, utils::users, 7, user_id);
 }
 
 std::vector<Friend> QQSystem::readGroups(int user_id)
