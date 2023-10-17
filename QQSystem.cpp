@@ -57,6 +57,7 @@ void QQSystem::showMenu()
 	rgbSet(255, 255, 255, 0, 0, 0);
 	std::cout << "请输入您的的选择:\n";
 	int choice;
+	//更新
 	std::cin >> choice;
 	switch (choice) {
 		case 1:login() ? menu1() : showMenu(); break;
