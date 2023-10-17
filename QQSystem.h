@@ -1,14 +1,15 @@
 #pragma once
-#include "User.h"
-#include <algorithm>
-#include <Windows.h>
+#include "CommunicationPlatform.h"
 #include "QQGroup.h"
-#include <filesystem>
 
 
-class QQSystem
+class QQSystem : public CommunicationPlatform
 {
 public:
+	QQSystem();
+	void showMenu() override;
+	void init() override;
+	void readUsers() override;
 	//用户相关
 	void createUser();
 	User* selectUser(int id);
@@ -29,12 +30,11 @@ public:
 	QQGroup* showGroup();
 	void updateGroup();
 	void newGroup(QQGroup* group, int admin);
-	static QQSystem* getInstance();
 	QQSystem(QQSystem const&) = delete;
 	void operator=(QQSystem const&) = delete;
 	void setUser(User* user);
 
-	void readUsers();
+	
 	static bool addFriend(int user_id, Friend newFriend);
 	static bool addTmpFriend(int user_id, Friend newFriend);
 	static bool addGroup(int user_id, Friend newGroup);
@@ -46,6 +46,8 @@ public:
 	static std::vector<Friend> readTmpGroups(int user_id);
 	static std::vector<Friend> readMembers(int group_id);
 	static std::vector<Friend> readTmpMembers(int group_id);
+	bool saveGroups();
+	bool saveUsers() override;
 	static bool saveGroups(int user_id, std::vector<Friend> myGroups);
 	static bool saveFriends(int user_id, std::vector<Friend> friends);
 	static bool saveTmpFriends(int user_id, std::vector<Friend> tmpFriends);
@@ -53,11 +55,7 @@ public:
 	static bool saveMembers(int group_id, std::vector<Friend> members);
 	static bool saveTmpMembers(int group_id, std::vector<Friend> tmpMembers);
 private:
-	static QQSystem* QQ;
-	QQSystem() : currentUser(nullptr){};
 public:
-	User* currentUser;
-	std::vector<User> users;
 	std::vector<QQGroup> allGroups;//所有群
 	std::vector<Friend> myGroups;//个人加入的群
 	std::vector<Friend> tmpGroups;
