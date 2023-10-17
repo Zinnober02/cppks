@@ -33,6 +33,7 @@ public:
 	bool updateBlog();
 	void like(blog& b);
 	void printBlog(blog& b);
+	void printCommit(commit& c);
 	bool saveCommits();
 	bool saveBlogs();
 	bool readAllBlogs();

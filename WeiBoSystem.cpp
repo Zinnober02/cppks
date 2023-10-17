@@ -112,6 +112,7 @@ void WeiBoSystem::menu1()
 	std::cin >> choice;
 	switch (choice) {
 	case 1: {
+		showBlog();
 		auto& b = *(selectBlog());
 		detail(b);
 		break;
@@ -225,30 +226,34 @@ bool WeiBoSystem::detail(blog& b)
 	printBlog(b);
 
 	auto c = readCommits(b.id);
-	for (auto& i : c) {
-		std::cout << i.user_id << ":" << i.content << "\t" << i.date << std::endl;
-	}
-	std::cout << "\t【1】点赞\n\t【2】评论\n\t【3】转发\n\t【0】返回\n";
+	for (auto& i : c) printCommit(i);
+	std::cout << "\t【1】点赞\n\t【2】评论\n";
+	if (b.author_id == currentUser->_id) std::cout << " \t【3】查看点赞列表\n";
+	std::cout << "\t【0】返回\n";
 	int choice; bool flag = true;
-	while (flag) {
-		std::cin >> choice;
-		switch (choice) {
-		case 1: {
-			like(b);
-			system("cls");
-			rgbSet(30, 144, 255, 0, 0, 0);//浅蓝
-			std::cout << "---------------------------------------------------------------\n";
-			rgbSet(255, 215, 0, 0, 0, 0);//黄色
-			printBlog(b);
-			std::cout << "\t【1】点赞\n\t【2】评论\n\t【3】转发\n\t【0】返回\n";
-			break;
-		}
-		case 2: addCommit(b.id); break;
-		case 3: break;
-		case 0: flag = false; break;
-		}
+	std::cin >> choice;
+	switch (choice) {
+	case 1: {
+		like(b);
+		detail(b);
+		break;
 	}
-	return saveBlogs();
+	case 2: addCommit(b.id); break;
+	case 3: {
+		if (b.author_id != currentUser->_id) break;
+		std::cout << "点赞用户：\n";
+		for (auto& user : b.likes) {
+			std::cout << "\t" << getUsername(user) << std::endl;
+		}
+		system("pause");
+		break;
+	}
+	case 0: menu1(); break;
+	default: detail(b); break;
+	}
+	if (!saveBlogs()) return false;
+	detail(b);
+	return true;
 }
 
 //bool WeiBoSystem::updateBlog()
@@ -275,12 +280,26 @@ void WeiBoSystem::like(blog& b)
 void WeiBoSystem::printBlog(blog& b)
 {
 	rgbSet(255, 215, 0, 0, 0, 0);//黄色
-	std::cout << "博主: " << getUsername(b.author_id) << "(" << b.author_id << ")\n";
+	std::cout << "博主: " << getUsername(b.author_id) << "(" << b.author_id << ")" << "\t编号" << b.id << std::endl;
 	rgbSet(135, 206, 235, 0, 0, 0);//蓝色
-	std::cout << "微博标题: " << b.title << "\t编号" << b.id << std::endl;
+	std::cout << "微博标题: " << b.title << std::endl;
 	rgbSet(124, 252, 0, 0, 0, 0);//绿色
 	std::cout << "发帖时间: " << b.date.year() << "年" << static_cast<unsigned>(b.date.month())
 		<< "月" << b.date.day() << "日" << "\t" << b.likes.size() << "赞\n";
+	rgbSet(30, 144, 255, 0, 0, 0);//浅蓝
+	std::cout << "---------------------------------------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);//白色
+}
+
+void WeiBoSystem::printCommit(commit& c)
+{
+	rgbSet(30, 144, 255, 0, 0, 0);//浅蓝
+	std::cout << getUsername(c.user_id);
+	if (c.father_id) std::cout << "回复" << getUsername(c.father_id);
+	std::cout << "\t\t" << c.date.year() << "年" << static_cast<unsigned>(c.date.month())
+		<< "月" << c.date.day() << "日\n";
+	rgbSet(255, 255, 255, 0, 0, 0);//白色
+	std::cout << "\t " << c.content << "\n";
 	rgbSet(30, 144, 255, 0, 0, 0);//浅蓝
 	std::cout << "---------------------------------------------------------------\n";
 	rgbSet(255, 255, 255, 0, 0, 0);//白色
