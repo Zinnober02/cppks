@@ -24,6 +24,17 @@ struct Friend {
 	int status = wait;
 	int admin = 0;//管理员权限， 0成员 1管理员，2群主
 
+	Friend(Friend* u) {
+		id = u->id;
+		nickname = u->nickname;
+		flag = u->flag;
+		status = u->status;
+		admin = u->admin;
+	}
+	Friend() {};
+	Friend(int id, std::string nickname, bool flag = false, int status = wait, int admin = 0)
+		: id(id), nickname(nickname), flag(flag), status(status), admin(admin) {};
+
 	friend std::ostream& operator<<(std::ostream& os, const Friend& obj) {
 		os << obj.id << " " << obj.nickname << " " << obj.flag << " " << obj.status << " " << obj.admin;
 		return os;
@@ -37,6 +48,12 @@ struct Friend {
 		if (a.status == wait) return a.flag ? "等待同意" : "等待对方同意";
 		if (a.status == reject) return a.flag ? "已拒绝" : "已被拒绝";
 		return "已同意";
+	}
+	
+	static std::string getAdmin(const Friend& a) {
+		if (a.admin == 2) return "群主";
+		if (a.admin == 1) return "管理员";
+		return "成员";
 	}
 };
 
