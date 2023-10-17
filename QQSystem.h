@@ -22,27 +22,38 @@ public:
 	void selfMenu();
 	void serviceMenu();
 	//好友相关
-	void addFriend();
-	void deleteFriend();
-	void showFriend(); 
-	void updateFriend();
+	void addFriend(int id);
+	static bool addFriend(int user_id, Friend newFriend);
+	bool deleteFriend(Friend u);
+	Friend* showFriends(); 
+	bool updateFriend(Friend* u);
 	void newFriend();
+	void friendMenu1();
+	void groupMenu1();
+	std::string getUsername(int user_id);
 
 	bool updateApplication(int id, Friend u, bool flag = true, bool kind = true);//更新被申请对象的申请列表
 
 	//群相关
-	void addGroup();
-	void deleteGroup();
+	void addGroup(int user_id, int group_id);
+	void deleteGroup(QQGroup& group);
 	void newGroup();
-	QQGroup* showGroup();
+	QQGroup* showGroups();
 	void updateGroup();
 	void newGroup(QQGroup* group, int admin);
+	
+	
+	
+	
+	
+	
+	
 	QQSystem(QQSystem const&) = delete;
 	void operator=(QQSystem const&) = delete;
 	void setUser(User* user);
-
 	
-	static bool addFriend(int user_id, Friend newFriend);
+	
+	
 	static bool addTmpFriend(int user_id, Friend newFriend);
 	static bool addGroup(int user_id, Friend newGroup);
 	static bool addTmpGroup(int user_id, Friend newGroup);
