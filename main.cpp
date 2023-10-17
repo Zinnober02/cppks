@@ -1,4 +1,3 @@
-#include <iostream>
 #include "QQSystem.h"
 #include "WeiBoSystem.h"
 
@@ -36,28 +35,27 @@
 //}
 
 int main() {
-	//test01();
-	//test02();
-	User* user = new User(2, "1", "李智");
-	QQSystem::getInstance()->setUser(user);
-	QQSystem::getInstance()->readUsers();
-	QQSystem::getInstance()->friends = QQSystem::readFriends(user->_id);
-	QQSystem::getInstance()->tmpFriends = QQSystem::readTmpFriends(user->_id);
-	//test03();
-	QQSystem::getInstance()->readGroups();
+	std::cout << "1QQ 2微信 3微博\n";
+	int choice;
+	std::cin >> choice;
+	CommunicationPlatform* service = nullptr;
+	switch (choice) {
+		case 1: {
+			service = new QQSystem();
+			break;
+		}
+		case 2: {
+
+		}
+		case 3: {
+			service = new WeiBoSystem();
+			break;
+		}
+	}
+	service->showMenu();
 	
-	QQSystem::getInstance()->myGroups = QQSystem::readGroups(user->_id);
-	//QQSystem::getInstance()->newFriend();
-	//QQSystem::getInstance()->deleteFriend();
-	//QQSystem::getInstance()->showFriend();
-	QQSystem::getInstance()->newGroup();
-	//QQSystem::getInstance()->deleteGroup();
-	//QQSystem::getInstance()->addGroup();
 	std::cout << "-----------\n";
-	//blog b = { 1, "标题", "内容", 1};
-	//std::cout << b << std::endl;
-	//QQSystem::getInstance()->updateFriend();
-	//QQSystem::getInstance()->showFriend();
+
 	system("pause");
 	return 0;
 }

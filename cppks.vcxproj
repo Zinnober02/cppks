@@ -135,6 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="blog.cpp" />
+    <ClCompile Include="CommunicationPlatform.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QQGroup.cpp" />
     <ClCompile Include="QQSystem.cpp" />
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="blog.h" />
+    <ClInclude Include="CommunicationPlatform.h" />
     <ClInclude Include="QQGroup.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="QQSystem.h" />

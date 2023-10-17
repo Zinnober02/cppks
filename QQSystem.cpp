@@ -1,7 +1,29 @@
 #include "QQSystem.h"
-#include <cassert>
 
-QQSystem* QQSystem::QQ = new QQSystem();
+QQSystem::QQSystem() {
+	readUsers();
+}
+
+void QQSystem::showMenu()
+{
+	User* user = new User(1, "1", "ÀîÖÇ");
+	setUser(user);
+	init();
+	showFriend();
+	//deleteFriend();
+	//newGroup();
+	//deleteGroup();
+	//addGroup();
+}
+
+void QQSystem::init()
+{
+	
+	friends = QQSystem::readFriends(currentUser->_id);
+	tmpFriends = QQSystem::readTmpFriends(currentUser->_id);
+	readGroups();
+	myGroups = QQSystem::readGroups(currentUser->_id);
+}
 
 User* QQSystem::selectUser(int id)
 {
@@ -275,6 +297,11 @@ std::vector<Friend> QQSystem::readTmpMembers(int group_id)
 	return utils::readData<Friend>(utils::QQ, utils::groups, 7, group_id);
 }
 
+bool QQSystem::saveUsers()
+{
+	return utils::saveData<User>(users, utils::QQ, utils::users, 0);
+}
+
 bool QQSystem::saveGroups(int user_id, std::vector<Friend> myGroups)
 {
 	return utils::saveData<Friend>(myGroups, utils::QQ, utils::users, 4, user_id);
@@ -305,10 +332,6 @@ bool QQSystem::saveTmpMembers(int group_id, std::vector<Friend> tmpMembers)
 	return utils::saveData<Friend>(tmpMembers, utils::QQ, utils::groups, 7, group_id);
 }
 
-QQSystem* QQSystem::getInstance()
-{
-	return QQ;
-}
 
 void QQSystem::setUser(User* user)
 {
