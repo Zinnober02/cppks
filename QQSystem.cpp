@@ -4,16 +4,65 @@ QQSystem::QQSystem() {
 	readUsers();
 }
 
+
+bool QQSystem::login()
+{
+	system("cls");
+	int ID;
+	std::string PassWord;
+	std::cout << "输入要登陆的QQ:" << std::endl;
+	std::cin >> ID;
+	auto it = utils::selectIterator(users, ID, [](const User& u, int _id) {
+		return u._id == _id;
+		});
+	if (it == users.end()) {
+		std::cout << "未查询到该QQ号，请先申请，按任意键返回" << std::endl;
+		if (getchar() != EOF)
+			return false;
+	}
+	std::cout << "请输入该QQ的密码" << std::endl;
+	std::cin >> PassWord;
+	// [表情]fe_flush(stdin);
+	while (PassWord != it->_password) {
+		std::cout << "密码输入错误,请重新输入密码" << std::endl;
+		std::cin >> PassWord;
+	}
+	rgbSet(124, 252, 0, 0, 0, 0);
+	std::cout << "登陆成功，按任意键开始使用QQ" << std::endl;
+	rgbSet(255, 255, 255, 0, 0, 0);
+	currentUser = &*it;
+	init();
+	if (getchar() != EOF)
+		return true;
+}
+
+void QQSystem::createUser()
+{
+}
+
 void QQSystem::showMenu()
 {
-	User* user = new User(1, "1", "李智");
-	setUser(user);
-	init();
-	showFriend();
-	//deleteFriend();
-	//newGroup();
-	//deleteGroup();
-	//addGroup();
+	//User* user = new User(1, "1", "李智");
+	//setUser(user);
+	system("cls");
+	int select, key = 1;
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----------欢迎使用QQ-----------" << std::endl;
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】登录\n";
+	std::cout << "\t【2】注册\n";
+	std::cout << "\t【0】退出系统\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "--------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	std::cout << "请输入您的的选择:\n";
+	int choice;
+	std::cin >> choice;
+	switch (choice) {
+		case 1:login() ? menu1() : showMenu(); break;
+		case 2:createUser(); showMenu(); break;
+		case 0:exit(0); break;
+	}
 }
 
 void QQSystem::init()
@@ -32,6 +81,207 @@ User* QQSystem::selectUser(int id)
 		});
 	if (it != users.end()) return &*it;
 	else return nullptr;
+}
+
+void QQSystem::menu1()
+{
+	system("cls");
+	int select;
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "--------------欢迎使用QQ----------------\n";
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t你的QQ号为:" << currentUser->_id << std::endl;
+	std::cout << "\t请选择使用的功能\n";
+	std::cout << "\t【1】好友管理\n";
+	std::cout << "\t【2】群管理\n";
+	std::cout << "\t【3】个人资料\n";
+	std::cout << "\t【4】开通服务\n";
+	std::cout << "\t【0】返回主菜单\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----------------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	std::cout << "请输入你的选择\n";
+	std::cin >> select;
+	switch (select) {
+	case 1: friendMenu(); break;
+	case 2: groupMenu(); break;
+	case 3: selfMenu(); break;
+	case 4: serviceMenu(); break;
+	case 0: menu1(); break;
+	default: showMenu(); break;
+	}
+}
+
+void QQSystem::friendMenu()
+{
+	system("cls");
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "---------------请选择好友操作----------------\n";
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】添加好友\n";
+	std::cout << "\t【2】显示所有好友\n";
+	std::cout << "\t【3】删除好友\n";
+	std::cout << "\t【4】查看好友申请\n";
+	std::cout << "\t【5】查看好友资料\n";
+	std::cout << "\t【6】修改好友备注\n";
+	std::cout << "\t【7】查看微信共同好友\n";
+	std::cout << "\t【8】添加微信共同好友\n";
+	std::cout << "\t【0】返回QQ主菜单\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "---------------------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	int select;
+	std::cin >> select;
+	switch (select) {
+	case 1:
+		addFriend();
+		break;
+	case 2:
+		showFriend();
+		break;
+	case 3:
+		deleteFriend();
+		break;
+	case 4:
+		newFriend();
+		break;
+	case 5:
+		//ShowFriendInformation();
+		break;
+	case 6:
+		//ChangeFriendRemarks();
+		break;
+	case 7:
+		//ShowWeChatCommonFriends();
+		break;
+	case 8:
+		//AddWeChatCommonFriend();
+		break;
+	case 0:
+		menu1();
+		return;
+	default:
+		showMenu();
+		return;
+	}
+}
+
+void QQSystem::groupMenu()
+{
+	system("cls");
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "------------------请选择群操作----------------\n";
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】加入QQ群\n";
+	std::cout << "\t【2】退出QQ群\n";
+	std::cout << "\t【3】创建QQ群\n";
+	std::cout << "\t【4】查看已加入的QQ群\n";
+	std::cout << "\t【5】查看入群申请\n";
+	std::cout << "\t【6】添加QQ群管理员\n";
+	std::cout << "\t【7】踢出群成员\n"; 
+	std::cout << "\t【8】查看群成员信息\n"; 
+	std::cout << "\t【9】创建临时讨论组\n";
+	std::cout << "\t【10】加入临时讨论组\n";
+	std::cout << "\t【11】邀请好友进群\n";
+	std::cout << "\t【0】返回\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----------------------------------------------\n" ;
+	rgbSet(255, 255, 255, 0, 0, 0);
+	std::cout << "请输入您的选择\n";
+	int select;
+	std::cin >> select;
+	switch (select) {
+	case 1:
+		addGroup();
+		break;
+	case 2:
+		deleteGroup();
+		break;
+	case 3:
+		//createGroup();
+		break;
+	case 4:
+		showGroup();
+		break;
+	case 5:
+		newGroup();
+		break;
+	case 6:
+		//ChangeFriendRemarks();
+		break;
+	case 7:
+		//ShowWeChatCommonFriends();
+		break;
+	case 8:
+		//AddWeChatCommonFriend();
+		break;
+	case 0:
+		menu1();
+		return;
+	default:
+		showMenu();
+		return;
+	}
+}
+
+void QQSystem::selfMenu()
+{
+	system("cls");
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "-------请选择所需的资料功能-------\n";
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】查看个人资料\n";
+	std::cout << "\t【2】修改密码\n";
+	std::cout << "\t【3】修改名称\n";
+	std::cout << "\t【4】修改签名\n";
+	std::cout << "\t【5】修改所在地\n";
+	std::cout << "\t【0】返回上一级菜单\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	int select;
+	std::cin >> select;
+	switch (select) {
+	case 1:
+		//addGroup();
+		break;
+	case 0:
+		menu1();
+		return;
+	default:
+		showMenu();
+		return;
+	}
+}
+
+void QQSystem::serviceMenu()
+{
+	system("cls");
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----------请选择服务----------\n";
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】开通微博\n";
+	std::cout << "\t【2】绑定微信\n";
+	std::cout << "\t【0】返回上一级\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	int select;
+	std::cin >> select;
+	switch (select) {
+	case 1:
+		//CreateWeiBo();
+		break;
+	case 2:
+		//LinkWeChat();
+		break;
+	case 0:
+		menu1();
+		break;
+	default:
+		showMenu();
+		return;
+	}
 }
 
 void QQSystem::addFriend()

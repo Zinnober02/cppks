@@ -14,18 +14,22 @@ public:
 	User* currentUser;
 	std::vector<blog> allBlogs;
 	std::vector<commit> allCommits;
-	blog* currentBlog;
 
 	void showMenu() override;
 	void readUsers() override;
 	void init() override;
 	bool saveUsers() override;
+	bool login() override;
+	void createUser() override;
+	std::string getUsername(int id);
+	void menu1();
+
 
 	void addBlog();
-	void addCommit();
+	void addCommit(int blog_id);
 	bool showBlog(User* user = nullptr);
 	blog* selectBlog();
-	bool detail();
+	bool detail(blog& b);
 	bool updateBlog();
 	void like(blog& b);
 	void printBlog(blog& b);

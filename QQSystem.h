@@ -11,9 +11,16 @@ public:
 	void init() override;
 	void readUsers() override;
 	//用户相关
-	void createUser();
+	bool login() override;
+	void createUser() override;
 	User* selectUser(int id);
 	void updateUser();
+
+	void menu1();
+	void friendMenu();
+	void groupMenu();
+	void selfMenu();
+	void serviceMenu();
 	//好友相关
 	void addFriend();
 	void deleteFriend();
