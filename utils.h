@@ -13,6 +13,10 @@ constexpr int wait = 0;
 constexpr int reject = 2;
 constexpr int agree = 1;
 
+void rgbSet(int wr, int wg, int wb, int br, int bg, int bb);
+
+
+
 struct Friend {
 	int id;
 	std::string nickname;//备注或者群昵称
@@ -130,16 +134,12 @@ namespace utils {
 		if (it != list.end()) return &*it;
 		else return nullptr;
 	}
-	template<class T, typename Cmp>
-	std::vector<T>::iterator selectIterator(std::vector<T>& list, int id, Cmp cmp)
+	template<class T, typename ID, typename Cmp>
+	std::vector<T>::iterator selectIterator(std::vector<T>& list, ID id, Cmp cmp)
 	{
 		auto it = find_if(list.begin(), list.end(), [&id, &cmp](const T& item) {
 			return cmp(item, id);
 			});
 		return it;
-	}
-
-	namespace document {
-
 	}
 }

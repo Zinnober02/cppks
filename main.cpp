@@ -33,29 +33,44 @@
 //		utils::saveData<Friend>(6, 0, group.members, group.id);
 //	}
 //}
-
-int main() {
-	std::cout << "1QQ 2微信 3微博\n";
+void MainMenu() {
+	system("cls");
+	int select, key = 1;
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "----欢迎使用模拟即时通信系统----" << std::endl;
+	rgbSet(135, 206, 235, 0, 0, 0);
+	std::cout << "\t【1】QQ\n";
+	std::cout << "\t【2】微博\n";
+	std::cout << "\t【3】微信\n";
+	std::cout << "\t【0】退出系统\n";
+	rgbSet(255, 215, 0, 0, 0, 0);
+	std::cout << "--------------------------------\n";
+	rgbSet(255, 255, 255, 0, 0, 0);
+	std::cout << "请输入您的的选择:\n";
 	int choice;
 	std::cin >> choice;
 	CommunicationPlatform* service = nullptr;
 	switch (choice) {
-		case 1: {
-			service = new QQSystem();
-			break;
-		}
-		case 2: {
-
-		}
-		case 3: {
-			service = new WeiBoSystem();
-			break;
-		}
+	case 1:
+		service = new QQSystem();
+		break;
+	case 2:
+		service = new WeiBoSystem();
+		break;
+	case 3:
+		break;
+	case 0:
+		exit(0);
+		break;
+	default:
+		MainMenu();
+		break;
 	}
 	service->showMenu();
-	
-	std::cout << "-----------\n";
+}
 
+int main() {
+	MainMenu();
 	system("pause");
 	return 0;
 }

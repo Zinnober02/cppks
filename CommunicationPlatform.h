@@ -10,6 +10,9 @@ public:
 	std::vector<User> users;
 	User* currentUser;
 
+
+	virtual bool login() = 0;
+	virtual void createUser() = 0;
 	virtual void showMenu() = 0;
 	virtual void init() = 0;
 	virtual void readUsers() = 0;

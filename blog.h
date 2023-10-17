@@ -19,7 +19,8 @@ public:
         id = ++cnt; //实现自增id
         date = floor<std::chrono::days>(std::chrono::system_clock::now());
     }
-    commit(int blog_id, int user_id, int father_id) : blog_id(blog_id), user_id(user_id), father_id(father_id) { 
+    commit(int blog_id, int user_id, int father_id, std::string content) 
+        : blog_id(blog_id), user_id(user_id), father_id(father_id), content(content) { 
         id = ++cnt; 
         date = floor<std::chrono::days>(std::chrono::system_clock::now());
     }
