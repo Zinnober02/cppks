@@ -23,6 +23,20 @@ public:
         id = ++cnt; 
         date = floor<std::chrono::days>(std::chrono::system_clock::now());
     }
+
+
+    friend std::ostream& operator<<(std::ostream& os, const commit& c) {
+        os << c.id << " " << c.content << " " << c.user_id << " " << c.father_id << " " << c.blog_id << " " <<
+            c.date.year() << " " << static_cast<unsigned>(c.date.month()) << " " << c.date.day();
+        return os;
+    }
+    friend std::istream& operator>>(std::istream& is, commit& c) {
+        using namespace::std::chrono;
+        int y, m, d;
+        is >> c.id >> c.content >> c.user_id >> c.father_id >> c.blog_id >> y >> m >> d;
+        c.date = year_month_day(year(y), month(m), day(d));
+        return is;
+    }
 };
 
 class blog
@@ -48,6 +62,12 @@ public:
         : id(id), title(title), content(content), author_id(author_id), 
         date(std::chrono::year_month_day(std::chrono::year(y), std::chrono::month(m), std::chrono::day(d))) {}
 
+    blog(std::string title, std::string content, int author_id, std::unordered_set<int> likes)
+        : id(id), title(title), content(content), author_id(author_id), likes(likes) {
+        this->date = getCurrentDate();
+        id = ++cnt;
+    }
+
     blog(std::string title, std::string content, int author_id)
         : title(title), content(content), author_id(author_id) {
         this->date = getCurrentDate();
@@ -56,11 +76,12 @@ public:
 
     void setDate(std::chrono::year_month_day date);
 
-
-
     friend std::ostream& operator<<(std::ostream& os, const blog& _Blog) {
-        os << _Blog.id << " " << _Blog.title << " " << _Blog.content << " " << _Blog.author_id
-            << " " << _Blog.date.year() << " " << _Blog.date.month() << " " << _Blog.date.day();
+        os << _Blog.id << " " << _Blog.title << " " << _Blog.content << " " << _Blog.author_id << " " << 
+            _Blog.date.year() << " " << static_cast<unsigned>(_Blog.date.month()) << " " << _Blog.date.day();
+        for (auto& like : _Blog.likes) {
+            os << " " << like;
+        }
         return os;
     }
     friend std::istream& operator>>(std::istream& is, blog& _Blog) {
@@ -68,6 +89,9 @@ public:
         int y, m, d;
         is >> _Blog.id >>  _Blog.title >> _Blog.content >> _Blog.author_id >> y >> m >> d;
         _Blog.setDate(year_month_day(year(y), month(m), day(d)));
+        int tmp;
+        while (is >> tmp)
+            _Blog.likes.emplace(tmp);
         return is;
     }
 };
