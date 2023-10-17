@@ -7,10 +7,16 @@ class QQGroup
 public:
 	int id;
 	std::string name;
-	Friend owner;//保存在QQGroups.txt中
+	Friend owner;//保存在Groups.txt中
 	std::vector<Friend> members;//保存在 members.txt中
 
 	QQGroup() {};
+	QQGroup(const QQGroup* g) {
+		id = g->id;
+		name = g->name;
+		owner = g->owner;
+		members = g->members;
+	};
 	QQGroup(int id, std::string name, Friend owner, std::vector<Friend> members)
 		: id(id), name(name), owner(owner), members(members) {};
 
